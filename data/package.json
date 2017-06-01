@@ -1,0 +1,28 @@
+{
+  "name": "laixue-api-client-nodejs",
+  "version": "0.0.1",
+  "description": "来来学网api接口客户端，nodejs版",
+  "main": "app.js",
+  "scripts": {
+    "dev": "supervisor app.js",
+    "prod": "forever app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.oschina.net:laixue/laixue-api-client-nodejs.git"
+  },
+  "keywords": [
+    "来来学",
+    "来学网",
+    "来学api"
+  ],
+  "author": "来学机构",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.15.3",
+    "express": "^4.15.2",
+    "express-resource": "^1.0.0",
+    "querystring": "^0.2.0"
+  }
+}
