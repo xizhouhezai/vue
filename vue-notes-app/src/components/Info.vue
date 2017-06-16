@@ -1,6 +1,6 @@
 <template>
   <div id="info">
-    <div class="alert" @click="Infomation">alert</div>
+    <button class="alert" @click="Infomation">alert</button>
   </div>
 </template>
 
@@ -8,11 +8,15 @@
   import Notyf from 'notyf'
   import 'notyf/dist/notyf.min.css'
 
-  let notyf = new Notyf()
+  let notyf = new Notyf({
+    delay: 4000,
+    alertIcon: 'fa fa-exclamation-circle',
+    comfirmIcon: 'fa fa-check-circle'
+  })
   export default {
     methods: {
       Infomation () {
-        notyf.alert('Please fill out the form')
+        notyf.confirm('Please fill out the form')
       }
     }
   }
