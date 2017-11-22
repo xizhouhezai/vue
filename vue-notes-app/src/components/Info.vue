@@ -1,8 +1,8 @@
 <template>
   <div id="info">
     <button class="alert" @click="Infomation">alert</button>
-    <div v-for="src in Img">
-      <img v-bind:src="src.src" alt="picture">
+    <div>
+      <img v-for="src in Img" v-bind:src="src" alt="">
     </div>
   </div>
 </template>
