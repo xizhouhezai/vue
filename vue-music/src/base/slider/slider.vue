@@ -5,16 +5,24 @@
       </slot>
     </div>
     <div class="dots">
+      <span class="dot" :class="{active: currentPageIndex === index}" v-for="(item, index) in dots"></span>
     </div>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
+  // 轮播图插件
   import BScroll from 'better-scroll'
   import {addClass} from 'common/js/dom.js'
 
   export default {
     name: 'slider',
+    data() {
+      return {
+        dots: [],
+        currentPageIndex: 0
+      }
+    },
     // 轮播的一些属性设置
     props: {
       loop: {
@@ -23,7 +31,7 @@
       },
       autoPlay: {
         type: Boolean,
-        default: false
+        default: true
       },
       interval: {
         type: Number,
@@ -32,12 +40,27 @@
     },
     // 初始化轮播图
     mounted() {
-      this._setSliderWidth()
-      this._initSlider()
+      setTimeout(() => {
+        this._setSliderWidth()
+        this._initDots()
+        this._initSlider()
+
+        if (this.autoPlay) {
+          this._play()
+        }
+      }, 20)
+
+      window.addEventListener('resize', () => {
+        if (!this.slider) {
+          return
+        }
+        this._setSliderWidth(true)
+        this.slider.refresh()
+      })
     },
     methods: {
       // 设置父容器的宽度方法
-      _setSliderWidth() {
+      _setSliderWidth(isResize) {
         this.children = this.$refs.sliderGroup.children
 
         let width = 0
@@ -49,7 +72,7 @@
           child.style.width = sliderWidth + 'px'
           width += sliderWidth
         }
-        if (this.loop) {
+        if (this.loop && !isResize) {
           width += 2 * sliderWidth
         }
         this.$refs.sliderGroup.style.width = width + 'px'
@@ -63,8 +86,33 @@
           snap: true,
           snapLoop: this.loop,
           snapThreshold: 0.3,
-          snapSpeed: 400
+          snapSpeed: 400,
+          click: true
         })
+        this.slider.on('scrollEnd', () => {
+          let pageIndex = this.slider.getCurrentPage().pageX
+          if (this.loop) {
+            pageIndex -= 1
+          }
+          this.currentPageIndex = pageIndex
+
+          if (this.autoPlay) {
+            clearTimeout(this.timer)
+            this._play()
+          }
+        })
+      },
+      _initDots() {
+        this.dots = new Array(this.children.length)
+      },
+      _play() {
+        let pageIndex = this.currentPageIndex + 1
+        if (this.loop) {
+          pageIndex += 1
+        }
+        this.timer = setTimeout(() => {
+          this.slider.goToPage(pageIndex, 0, 400)
+        }, this.interval)
       }
     }
   }

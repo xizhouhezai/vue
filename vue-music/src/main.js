@@ -3,6 +3,7 @@
 import 'babel-polyfill'
 import Vue from 'vue'
 import App from './App'
+// 解决点击事件延迟的问题
 import fastclick from 'fastclick'
 import router from './router'
 
