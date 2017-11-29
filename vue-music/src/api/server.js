@@ -31,7 +31,6 @@ apiRoutes.get('/getDiscList', (req, res) => {
         },
         params: data
     }).then((response) => {
-        console.log(11111)
         res.json(response.data)
     }).catch((err) => {
         console.log(err)
@@ -41,5 +40,5 @@ apiRoutes.get('/getDiscList', (req, res) => {
 app.use('/api', apiRoutes)
 
 app.listen(3003, () => {
-    console.log()
+    console.log('server is runing')
 })

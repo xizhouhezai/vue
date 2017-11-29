@@ -1,0 +1,144 @@
+<template>
+  <scroll class="listview" :data="data" ref="listview">
+    <ul>
+      <li v-for="group in data" class="list-group" ref="listGroup">
+        <h2 class="list-group-title">{{group.title}}</h2>
+        <uL>
+          <li v-for="item in group.items" class="list-group-item">
+            <img class="avatar" v-lazy="item.avatar">
+            <span class="name">{{item.name}}</span>
+          </li>
+        </uL>
+      </li>
+    </ul>
+    <div class="list-shortcut" @touchstart="onShortcutTouchStart" @touchmove="onShortcutTouchMove">
+      <ul>
+        <li class="item" v-for="(item, index) in shortcutList" :data-index="index">
+          {{item}}
+        </li>
+      </ul>
+    </div>
+  </scroll>
+</template>
+
+<script>
+  import Scroll from 'base/scroll/scroll'
+  import {getData} from 'common/js/dom'
+
+  const ANCHOR_HEIGHT = 18
+
+  export default {
+    created() {
+      this.touch = {}
+    },
+    props: {
+      data: {
+        type: Array,
+        default: []
+      }
+    },
+    // 计算属性
+    computed: {
+      // 获得listview的data.title
+      shortcutList() {
+        return this.data.map((group) => {
+          return group.title.substr(0, 1)
+        })
+      }
+    },
+    methods: {
+      // shortcut的触摸事件，当点击某个字母时，就索引到那个歌手组
+      onShortcutTouchStart(e) {
+        let anchorIndex = getData(e.target, 'index')
+        let firstTouch = e.touches[0]
+        this.touch.y1 = firstTouch.pageY
+        this.touch.anchorIndex = anchorIndex
+        this.scrollTo(anchorIndex)
+        console.log(firstTouch)
+      },
+      // shortcut的触摸事件，当滚动shortcut时，歌手组随着滚动
+      onShortcutTouchMove(e) {
+        let firstTouch = e.touches[0]
+        this.touch.y2 = firstTouch.pageY
+        let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0
+        let anchorIndex = parseInt(this.touch.anchorIndex) + delta
+        this.scrollTo(anchorIndex)
+      },
+      // 提取的跳转方法
+      scrollTo(index) {
+        this.$refs.listview.scroll.scrollToElement(this.$refs.listGroup[index], 0)
+      }
+    },
+    components: {
+      Scroll
+    }
+  }
+</script>
+
+<style scoped lang="stylus" rel="stylesheet/stylus">
+  @import "~common/stylus/variable"
+
+  .listview
+    position: relative
+    width: 100%
+    height: 100%
+    overflow: hidden
+    background: $color-background
+    .list-group
+      padding-bottom: 30px
+      .list-group-title
+        height: 30px
+        line-height: 30px
+        padding-left: 20px
+        font-size: $font-size-small
+        color: $color-text-l
+        background: $color-highlight-background
+      .list-group-item
+        display: flex
+        align-items: center
+        padding: 20px 0 0 30px
+        .avatar
+          width: 50px
+          height: 50px
+          border-radius: 50%
+        .name
+          margin-left: 20px
+          color: $color-text-l
+          font-size: $font-size-medium
+    .list-shortcut
+      position: absolute
+      z-index: 30
+      right: 0
+      top: 50%
+      transform: translateY(-50%)
+      width: 20px
+      padding: 20px 0
+      border-radius: 10px
+      text-align: center
+      background: $color-background-d
+      font-family: Helvetica
+      .item
+        padding: 3px
+        line-height: 1
+        color: $color-text-l
+        font-size: $font-size-small
+        &.current
+          color: $color-theme
+    .list-fixed
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      .fixed-title
+        height: 30px
+        line-height: 30px
+        padding-left: 20px
+        font-size: $font-size-small
+        color: $color-text-l
+        background: $color-highlight-background
+    .loading-container
+      position: absolute
+      width: 100%
+      top: 50%
+      transform: translateY(-50%)
+</style>
