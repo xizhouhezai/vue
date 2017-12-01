@@ -1,5 +1,11 @@
 <template>
-  <scroll class="listview" :data="data" ref="listview">
+  <scroll class="listview"
+          :data="data"
+          ref="listview"
+          @scroll="scroll"
+          :listen-scroll="listenScroll"
+          :probe-type="probeType"
+          >
     <ul>
       <li v-for="group in data" class="list-group" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
@@ -13,7 +19,12 @@
     </ul>
     <div class="list-shortcut" @touchstart="onShortcutTouchStart" @touchmove="onShortcutTouchMove">
       <ul>
-        <li class="item" v-for="(item, index) in shortcutList" :data-index="index">
+        <li
+          class="item"
+          v-for="(item, index) in shortcutList"
+          :data-index="index"
+          :class="{'current': currentIndex === index}"
+          >
           {{item}}
         </li>
       </ul>
@@ -29,12 +40,24 @@
 
   export default {
     created() {
+      // scroll的依赖组件better-scroll的属性，为3是会实时监听滚动
+      this.probeType = 3
+      // 用于存放shortcut的y轴位置
       this.touch = {}
+      // scroll的依赖组件better-scroll的属性，为true时就会监听scroll的滚动
+      this.listenScroll = true
+      this.listHeight = []
     },
     props: {
       data: {
         type: Array,
         default: []
+      }
+    },
+    data() {
+      return {
+        scrollY: -1,
+        currentIndex: 0
       }
     },
     // 计算属性
@@ -53,8 +76,7 @@
         let firstTouch = e.touches[0]
         this.touch.y1 = firstTouch.pageY
         this.touch.anchorIndex = anchorIndex
-        this.scrollTo(anchorIndex)
-        console.log(firstTouch)
+        this._scrollTo(anchorIndex)
       },
       // shortcut的触摸事件，当滚动shortcut时，歌手组随着滚动
       onShortcutTouchMove(e) {
@@ -62,11 +84,54 @@
         this.touch.y2 = firstTouch.pageY
         let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0
         let anchorIndex = parseInt(this.touch.anchorIndex) + delta
-        this.scrollTo(anchorIndex)
+        this._scrollTo(anchorIndex)
+      },
+      // 监听listview滚动
+      scroll(pos) {
+        this.scrollY = pos.y
       },
       // 提取的跳转方法
-      scrollTo(index) {
+      _scrollTo(index) {
         this.$refs.listview.scroll.scrollToElement(this.$refs.listGroup[index], 0)
+      },
+      // 获取每一个listgroup的高度
+      _calculateHeight() {
+        this.listHeight = []
+        let height = 0
+        this.listHeight.push(height)
+        const list = this.$refs.listGroup
+        for (let i = 0; i < list.length; i++) {
+          let item = list[i]
+          height += item.clientHeight
+          console.log(height)
+          this.listHeight.push(height)
+        }
+      }
+    },
+    watch: {
+      data() {
+        setTimeout(() => {
+          this._calculateHeight()
+        }, 20)
+      },
+      scrollY(newY) {
+        const listHeight = this.listHeight
+        // 当列表滚动到最上是
+        if (newY > 0) {
+          this.currentIndex = 0
+          return
+        }
+
+        for (let i = 0; i < listHeight.length; i++) {
+          let height1 = listHeight[i]
+          let height2 = listHeight[i + 1]
+          if ((-newY > height1) & (-newY < height2)) {
+            this.currentIndex = i
+            return
+          }
+        }
+        // 当滚动到底部，且-newY大于最后一个元素的上限
+        this.currentIndex = listHeight.length - 2
       }
     },
     components: {
