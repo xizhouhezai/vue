@@ -10,7 +10,7 @@
       <li v-for="group in data" class="list-group" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <uL>
-          <li v-for="item in group.items" class="list-group-item">
+          <li v-for="item in group.items" class="list-group-item" @click="selectItem(item)">
             <img class="avatar" v-lazy="item.avatar">
             <span class="name">{{item.name}}</span>
           </li>
@@ -28,6 +28,11 @@
           {{item}}
         </li>
       </ul>
+    </div>
+    <div class="list-fixed" v-show="listTilte">
+      <div class="fixed-title">
+        {{listTilte}}
+      </div>
     </div>
   </scroll>
 </template>
@@ -67,9 +72,20 @@
         return this.data.map((group) => {
           return group.title.substr(0, 1)
         })
+      },
+      // 获取listtitle
+      listTilte() {
+        if (this.scrollY > 0) {
+          return
+        }
+        return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
       }
     },
     methods: {
+      // 基础组件只派发一个点击事件，不处理业务逻辑
+      selectItem(item) {
+        this.$emit('select', item)
+      },
       // shortcut的触摸事件，当点击某个字母时，就索引到那个歌手组
       onShortcutTouchStart(e) {
         let anchorIndex = getData(e.target, 'index')
@@ -92,6 +108,16 @@
       },
       // 提取的跳转方法
       _scrollTo(index) {
+        console.log(index)
+        if (!index && index !== 0) {
+          return
+        }
+        if (index < 0) {
+          index = 0
+        } else if (index > this.listHeight.length - 2) {
+          index = this.listHeight.length - 2
+        }
+        this.scrollY = -this.listHeight[index]
         this.$refs.listview.scroll.scrollToElement(this.$refs.listGroup[index], 0)
       },
       // 获取每一个listgroup的高度
@@ -103,7 +129,6 @@
         for (let i = 0; i < list.length; i++) {
           let item = list[i]
           height += item.clientHeight
-          console.log(height)
           this.listHeight.push(height)
         }
       }
@@ -116,22 +141,22 @@
       },
       scrollY(newY) {
         const listHeight = this.listHeight
-        // 当列表滚动到最上是
+        // 当列表滚动到顶部
         if (newY > 0) {
           this.currentIndex = 0
           return
         }
 
-        for (let i = 0; i < listHeight.length; i++) {
+        for (let i = 0; i < listHeight.length - 1; i++) {
           let height1 = listHeight[i]
           let height2 = listHeight[i + 1]
-          if ((-newY > height1) & (-newY < height2)) {
+          if ((-newY >= height1) & (-newY < height2)) {
             this.currentIndex = i
             return
           }
         }
         // 当滚动到底部，且-newY大于最后一个元素的上限
-        this.currentIndex = listHeight.length - 2
+        this.currentIndex = this.listHeight.length - 2
       }
     },
     components: {
@@ -191,7 +216,7 @@
           color: $color-theme
     .list-fixed
       position: absolute
-      top: 0
+      top: -2px
       left: 0
       width: 100%
       .fixed-title

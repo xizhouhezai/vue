@@ -6,6 +6,7 @@ import App from './App'
 // 解决点击事件延迟的问题
 import fastclick from 'fastclick'
 import router from './router'
+import store from './store'
 
 import 'common/stylus/index.styl'
 
@@ -17,6 +18,7 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+  store,
   template: '<App/>',
   components: { App }
 })
