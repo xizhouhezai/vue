@@ -5,11 +5,28 @@
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
+      <div class="play-wrapper">
+        <div ref="playBtn" v-show="songs.length>0" class="play">
+          <i class="icon-play"></i>
+          <span class="text">随机播放全部</span>
+        </div>
+      </div>
       <div class="filter" ref="filter"></div>
     </div>
-    <scroll :data="songs"  class="list" ref="list">
+    <div class="bg-layer" ref="layer"></div>
+    <scroll 
+      :data="songs"  
+      class="list" 
+      ref="list"
+      :probe-type="probeType"
+      :listen-scroll="listenScroll"
+      @scroll="scroll"
+    >
       <div class="song-list-wrapper">
-        <song-list :songs="songs"></song-list>
+        <song-list :songs="songs" @select="selectItem"></song-list>
+      </div>
+      <div class="loading-container" v-show="!songs.length">
+        <loading></loading>
       </div>
     </scroll>
   </div>
@@ -18,6 +35,15 @@
 <script>
   import Scroll from 'base/scroll/scroll'
   import SongList from 'base/song-list/song-list'
+  import {prefixStyle} from 'common/js/dom'
+  import Loading from 'base/loading/loading'
+  import {mapActions} from 'vuex'
+
+  // 到顶部预留的高度
+  const RESERVED_HEIGHT = 40
+
+  // 直接拼接想要拼接的css属性
+  var transform = prefixStyle('transform')
 
   export default {
     props: {
@@ -34,22 +60,73 @@
         default: ''
       }
     },
+    data() {
+      return {
+        scrollY: 0
+      }
+    },
+    created() {
+      this.probeType = 3
+      this.listenScroll = true
+    },
     computed: {
       bgStyle() {
         return `background-image: url(${this.bgImage})`
       }
     },
     mounted() {
+      this.imageHeight = this.$refs.bgImage.clientHeight
+      this.minTranslateY = -this.imageHeight + RESERVED_HEIGHT
       this.$refs.list.$el.style.top = this.$refs.bgImage.clientHeight + 'px'
     },
     methods: {
       back() {
         this.$router.back()
-      }
+      },
+      scroll(pos) {
+        this.scrollY = pos.y
+      },
+      selectItem(items, index) {
+        this.selectPlay({
+          list: this.songs,
+          index
+        })
+      },
+      ...mapActions([
+        'selectPlay'
+      ])
     },
     components: {
       Scroll,
-      SongList
+      SongList,
+      Loading
+    },
+    watch: {
+      scrollY(newY) {
+        let translateY = Math.max(this.minTranslateY, newY)
+        let zIndex = 0
+        let scale = 1
+        this.$refs.layer.style[transform] = `translate3d(0, ${translateY}px, 0)`
+        // 计算图片随着滚动向下的变化
+        const percent = Math.abs(newY / this.imageHeight)
+        if (newY > 0) {
+          scale = 1 + percent
+          zIndex = 10
+        }
+
+        if (newY < this.minTranslateY) {
+          zIndex = 10
+          this.$refs.bgImage.style.height = `${RESERVED_HEIGHT}px`
+          this.$refs.bgImage.style.paddingTop = 0
+          this.$refs.playBtn.style.display = 'none'
+        } else {
+          this.$refs.bgImage.style.height = 0
+          this.$refs.bgImage.style.paddingTop = '70%'
+          this.$refs.playBtn.style.display = ''
+        }
+        this.$refs.bgImage.style.zIndex = zIndex
+        this.$refs.bgImage.style[transform] = `scale(${scale})`
+      }
     }
   }
 </script>
@@ -135,7 +212,6 @@
       bottom: 0
       width: 100%
       background: $color-background
-      overflow: hidden
       .song-list-wrapper
         padding: 20px 30px
       .loading-container
