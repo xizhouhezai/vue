@@ -15,25 +15,32 @@
         <div class="middle">
           <div class="middle-l" ref="middleL">
             <div class="cd-wrapper" ref="cdWrapper">
-              <div class="cd">
+              <div class="cd" :class="adCls">
                 <img class="image" :src="currentSong.image">
               </div>
             </div>
           </div>
         </div>
         <div class="bottom">
+          <div class="progress-wrapper">
+            <span class="time time-l">{{format(currentTime)}}</span>
+            <div class="progress-bar-wrapper">
+              <progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar>
+            </div>
+            <span class="time time-r">{{format(currentSong.duration)}}</span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-sequence"></i>
             </div>
-            <div class="icon i-left">
-              <i class="icon-prev"></i>
+            <div class="icon i-left" :class="disableCls">
+              <i @click="prev" class="icon-prev"></i>
             </div>
-            <div class="icon i-center">
+            <div class="icon i-center"  :class="disableCls">
               <i :class="playIcon" @click="togglePlaying"></i>
             </div>
-            <div class="icon i-right">
-              <i class="icon-next"></i>
+            <div class="icon i-right" :class="disableCls">
+              <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
               <i class="icon icon-not-favorite"></i>
@@ -45,7 +52,7 @@
     <transition>
       <div class="mini-player" v-show="!fullScreen" @click="open">
         <div class="icon">
-          <img width="40" height="40"  :src="currentSong.image">
+          <img width="40" height="40"  :src="currentSong.image" :class="adCls">
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
@@ -59,25 +66,43 @@
         </div>
       </div>
     </transition>
-    <audio :src="currentSong.url" ref="audio"></audio>
+    <audio :src="currentSong.url" ref="audio" @play="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
 <script>
   import {mapGetters, mapMutations} from 'vuex'
+  import progressBar from 'base/progress-bar/progress-bar'
+
   export default {
+    data() {
+      return {
+        songReady: false,
+        currentTime: 0
+      }
+    },
     computed: {
+      adCls() {
+        return this.playing ? 'play' : 'play pause'
+      },
       playIcon() {
         return this.playing ? 'icon-pause' : 'icon-play'
       },
+      disableCls() {
+        return this.songReady ? '' : 'disable'
+      },
       miniIcon() {
         return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+      },
+      percent() {
+        return this.currentTime / this.currentSong.duration
       },
       ...mapGetters([
         'fullScreen',
         'playlist',
         'currentSong',
-        'playing'
+        'playing',
+        'currentIndex'
       ])
     },
     methods: {
@@ -90,9 +115,81 @@
       togglePlaying() {
         this.setPlayingState(!this.playing)
       },
+      next() {
+        if (!this.songReady) {
+          return
+        }
+        let index = this.currentIndex + 1
+        if (index === this.playlist.length) {
+          index = 0
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
+        this.songReady = false
+      },
+      prev() {
+        if (!this.songReady) {
+          return
+        }
+        let index = this.currentIndex - 1
+        if (index === 0) {
+          index = this.playlist.length - 1
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
+        this.songReady = false
+      },
+      ready() {
+        this.songReady = true
+      },
+      error() {
+        this.songReady = true
+      },
+      updateTime() {
+        this.currentTime = this.$refs.audio.currentTime
+      },
+      onProgressBarChange(percent) {
+        console.log(percent)
+        const currentTime = this.currentSong.duration * percent
+        this.$refs.audio.currentTime = currentTime
+        if (!this.playing) {
+          this.togglePlaying()
+        }
+        if (percent === 1) {
+          console.log(this.$refs.audio.currentTime)
+        }
+        console.log(this.$refs.audio.currentTime)
+      },
+      // 处理歌曲时间的方法
+      format(interval) {
+        // 向下取整
+        interval = interval | 0
+        let minute = interval / 60 | 0
+        let second = this._pad(interval % 60 | 0)
+        return `${minute}:${second}`
+      },
+      // 为时间补零
+      /**
+      * @params num {number} 参数second
+      * @params n {number}
+      */
+      _pad(num, n = 2) {
+        // 将数字转换为字符串，并获取其长度
+        let len = num.toString().length
+        while (len < n) {
+          num = '0' + num
+          len++
+        }
+        return num
+      },
       ...mapMutations({
         setFullScreen: 'SET_FULL_SCREEN',
-        setPlayingState: 'SET_PLAYING_STATE'
+        setPlayingState: 'SET_PLAYING_STATE',
+        setCurrentIndex: 'SET_CURRENT_INDEX'
       })
     },
     watch: {
@@ -107,6 +204,9 @@
           newVal ? audio.play() : audio.pause()
         })
       }
+    },
+    components: {
+      progressBar
     }
   }
 </script>
