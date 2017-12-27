@@ -106,6 +106,9 @@
       scroll(pos) {
         this.scrollY = pos.y
       },
+      refresh() {
+        this.$refs.listview.refresh()
+      },
       // 提取的跳转方法
       _scrollTo(index) {
         console.log(index)

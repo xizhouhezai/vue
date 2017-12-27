@@ -23,7 +23,7 @@
       @scroll="scroll"
     >
       <div class="song-list-wrapper">
-        <song-list :songs="songs" @select="selectItem"></song-list>
+        <song-list :rank="rank" :songs="songs" @select="selectItem"></song-list>
       </div>
       <div class="loading-container" v-show="!songs.length">
         <loading></loading>
@@ -38,6 +38,7 @@
   import {prefixStyle} from 'common/js/dom'
   import Loading from 'base/loading/loading'
   import {mapActions} from 'vuex'
+  import {playlistMixin} from 'common/js/mixin'
 
   // 到顶部预留的高度
   const RESERVED_HEIGHT = 40
@@ -46,6 +47,7 @@
   var transform = prefixStyle('transform')
 
   export default {
+    mixins: [playlistMixin],
     props: {
       songs: {
         type: Array,
@@ -58,6 +60,10 @@
       title: {
         type: String,
         default: ''
+      },
+      rank: {
+        type: Boolean,
+        default: false
       }
     },
     data() {
@@ -80,6 +86,11 @@
       this.$refs.list.$el.style.top = this.$refs.bgImage.clientHeight + 'px'
     },
     methods: {
+      handlePlaylist(playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+        this.$refs.list.$el.style.bottom = bottom
+        this.$refs.list.refresh()
+      },
       back() {
         this.$router.back()
       },

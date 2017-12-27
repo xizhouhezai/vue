@@ -23,6 +23,9 @@
                 <img class="image" :src="currentSong.image">
               </div>
             </div>
+            <div class="playing-lyric-wrapper">
+              <div class="playing-lyric">{{playingLyric}}</div>
+            </div>
           </div>
           <scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">
             <div class="lyric-wrapper">
@@ -121,7 +124,9 @@
         // 初始化播放歌词的行
         currentLineNum: 0,
         // 维护cd唱盘和歌词的显示
-        currentShow: 'cd'
+        currentShow: 'cd',
+        // 精简歌词
+        playingLyric: ''
       }
     },
     computed: {
@@ -317,6 +322,10 @@
           if (this.playing) {
             this.currentLyric.play()
           }
+        }).catch(() => {
+          this.currentLyric = null
+          this.playingLyric = ''
+          this.currentLineNum = 0
         })
       },
       // New Lyric的回调函数，获得一个对象参数
@@ -328,6 +337,7 @@
         } else {
           this.$refs.lyricList.scrollTo(0, 0, 1000)
         }
+        this.playingLyric = txt
       },
       // 处理歌曲时间的方法
       format(interval) {
@@ -370,6 +380,9 @@
         })
         if (this.currentLyric) {
           this.currentLyric.stop()
+          this.currentTime = 0
+          this.playingLyric = ''
+          this.currentLineNum = 0
         }
       },
       playing(newVal) {
