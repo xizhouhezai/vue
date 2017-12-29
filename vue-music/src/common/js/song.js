@@ -48,7 +48,7 @@ export function createSongs(musicData) {
 }
 
 // 处理歌手数组的方法
-function filtersSinger(singer) {
+export function filtersSinger(singer) {
   let ret = []
   if (!singer) {
     return ''
