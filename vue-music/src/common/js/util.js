@@ -19,3 +19,21 @@ export const shuffle = (arr) => {
   }
   return _arr
 }
+
+/**
+ * 节流函数
+ * @param {function} func 需要被节流的函数
+ * @param {number} delay 要节流的时间
+ * @returns {function} 返回一个函数
+ */
+export const debounce = function(func, delay) {
+  let timer
+  return function(...args) {
+    if (timer) {
+      clearTimeout(timer)
+    }
+    timer = setTimeout(function() {
+      func.apply(this, args)
+    }, delay)
+  }
+}

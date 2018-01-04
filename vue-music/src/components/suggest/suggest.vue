@@ -16,6 +16,9 @@
       </li>
       <loading v-show="loading" title=""></loading>
     </ul>
+    <div class="no-result-wrapper" v-show="!hasMore && !result.length">
+      <no-result title="抱歉，暂无搜索结果"></no-result>
+    </div>
   </scroll>
 </template>
 
@@ -26,7 +29,8 @@
   import Scroll from 'base/scroll/scroll'
   import Loading from 'base/loading/loading'
   import Singer from 'common/js/singer'
-  import {mapMutations} from 'vuex'
+  import {mapMutations, mapActions} from 'vuex'
+  import NoResult from 'base/no-result/no-result'
 
   const perpage = 20
   const TYPE_SINGER = 'singer'
@@ -65,7 +69,11 @@
             path: `/search/${singer.id}`
           })
           this.setSinger(singer)
+        } else {
+          this.insertSong(item)
         }
+        // 派发一个点击事件，用于保存搜索历史
+        this.$emit('select')
       },
       // 判断这个返回数据是一个歌手还是歌曲
       getIconCls(item) {
@@ -137,7 +145,10 @@
       },
       ...mapMutations({
         setSinger: 'SET_SINGER'
-      })
+      }),
+      ...mapActions([
+        'insertSong'
+      ])
     },
     watch: {
       query(newQuery) {
@@ -146,7 +157,8 @@
     },
     components: {
       Scroll,
-      Loading
+      Loading,
+      NoResult
     }
   }
 </script>

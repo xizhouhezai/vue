@@ -7,6 +7,7 @@
 </template>
 
 <script>
+  import {debounce} from 'common/js/util'
   export default {
     data() {
       return {
@@ -21,9 +22,9 @@
     },
     created() {
       // 把query以事件的参数暴露出去
-      this.$watch('query', (newQuery) => {
+      this.$watch('query', debounce((newQuery) => {
         this.$emit('query', newQuery)
-      })
+      }, 600))
     },
     methods: {
       // 清空搜索框的内容

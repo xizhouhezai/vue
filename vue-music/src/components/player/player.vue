@@ -220,11 +220,15 @@
         }
         this.songReady = false
       },
-      ready() {
+      ready(e) {
         this.songReady = true
       },
-      error() {
+      error(e) {
         this.songReady = true
+        if (e.type === 'error') {
+          this.songReady = false
+          this.togglePlaying()
+        }
       },
       updateTime() {
         this.currentTime = this.$refs.audio.currentTime
