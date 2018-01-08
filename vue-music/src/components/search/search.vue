@@ -47,8 +47,10 @@
   import {mapActions, mapGetters} from 'vuex'
   import SearchList from 'base/search-list/search-list'
   import Scroll from 'base/scroll/scroll'
+  import {playlistMixin} from 'common/js/mixin'
 
   export default {
+    mixins: [playlistMixin],
     data() {
       return {
         hotKey: [],
@@ -68,6 +70,15 @@
       this._getHotKey()
     },
     methods: {
+      handlePlaylist(playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+
+        this.$refs.shortcutWrapper.style.bottom = bottom
+        this.$refs.shortcut.refresh()
+
+        this.$refs.searchResult.style.bottom = bottom
+        this.$refs.suggest.refresh()
+      },
       addQuery(query) {
         this.$refs.searchBox.setQuery(query)
       },

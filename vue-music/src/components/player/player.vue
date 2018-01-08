@@ -84,11 +84,12 @@
             <i class="icon-mini" :class="miniIcon" @click.stop="togglePlaying"></i>
           </progress-circle>
         </div>
-        <div class="control">
+        <div class="control" @click.stop="showPlaylist">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+    <playlist ref="playlist"></playlist>
     <audio 
       :src="currentSong.url" 
       ref="audio" 
@@ -109,6 +110,7 @@
   import Lyric from 'lyric-parser'
   import Scroll from 'base/scroll/scroll'
   import {prefixStyle} from 'common/js/dom'
+  import Playlist from 'components/playlist/playlist'
 
   const transform = prefixStyle('transform')
   const transitionDuration = prefixStyle('transitionDuration')
@@ -193,7 +195,12 @@
         if (!this.songReady) {
           return
         }
-        let index = this.currentIndex + 1
+        let index = null
+        if (this.playlist.length === 1) {
+          this.loop()
+          return
+        }
+        index = this.currentIndex + 1
         if (index === this.playlist.length) {
           index = 0
         }
@@ -287,9 +294,11 @@
         this.$refs.middleL.style[transitionDuration] = `${time}ms`
         this.touch.initiated = false
       },
+      showPlaylist() {
+        this.$refs.playlist.show()
+      },
       // 拖动进度条
       onProgressBarChange(percent) {
-        console.log(percent)
         const currentTime = this.currentSong.duration * percent
         this.$refs.audio.currentTime = currentTime
         if (!this.playing) {
@@ -374,7 +383,10 @@
       })
     },
     watch: {
-      currentSong(oldSong, newSong) {
+      currentSong(newSong, oldSong) {
+        if (!newSong.id) {
+          return
+        }
         if (oldSong.id === newSong.id) {
           return
         }
@@ -399,7 +411,8 @@
     components: {
       progressBar,
       progressCircle,
-      Scroll
+      Scroll,
+      Playlist
     }
   }
 </script>

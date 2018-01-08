@@ -104,6 +104,9 @@
           }
         })
       },
+      refresh() {
+        this.$refs.suggest.refresh()
+      },
       // 检查有没有更多数据
       _checkMore(data) {
         const song = data.song
