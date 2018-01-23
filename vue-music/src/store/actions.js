@@ -114,3 +114,12 @@ export function deleteSong({commit, state}, song) {
     commit(types.SET_PLAYING_STATE, true)
   }
 }
+
+// 删除palylist所有歌曲
+
+export function deleteSongList({commit}) {
+  commit(types.SET_PLAYLIST, [])
+  commit(types.SET_SEQUENCE_LIST, [])
+  commit(types.SET_PLAYING_STATE, false)
+  commit(types.SET_CURRENT_INDEX, -1)
+}
