@@ -1,14 +1,15 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import goodList from '@/components/good-list/good-list'
+import HelloWorld from '@/components/HelloWorld'
 
 Vue.use(Router)
 
 export default new Router({
   routes: [
     {
-      path: '/goods',
-      component: goodList
+      path: '/',
+      name: 'HelloWorld',
+      component: HelloWorld
     }
   ]
 })
