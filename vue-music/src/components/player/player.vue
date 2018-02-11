@@ -91,13 +91,14 @@
     </transition>
     <playlist ref="playlist"></playlist>
     <audio 
-      :src="currentSong.url" 
+      :src="currentSong.url"
       ref="audio" 
       @play="ready" 
       @error="error" 
       @timeupdate="updateTime"
       @ended="end"
-    ></audio>
+    >
+    </audio>
   </div>
 </template>
 
@@ -533,7 +534,7 @@
                 color: $color-text
       .bottom
         position: absolute
-        bottom: 50px
+        bottom: 25px
         width: 100%
         .dot-wrapper
           text-align: center

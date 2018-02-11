@@ -30,6 +30,9 @@ const matutaions = {
   },
   [types.SET_SEARCH_HISTORY](state, list) {
     state.searchHistory = list
+  },
+  [types.SET_IS_AUTH](state, auth) {
+    state.isAuth = auth
   }
 }
 

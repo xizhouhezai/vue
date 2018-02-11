@@ -17,7 +17,8 @@ const state = {
   currentIndex: -1,
   disc: {},
   topList: {},
-  searchHistory: localsearch()
+  searchHistory: localsearch(),
+  isAuth: false
 }
 
 export default state

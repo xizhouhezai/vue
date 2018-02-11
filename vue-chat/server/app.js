@@ -23,7 +23,8 @@ server.listen(3003, () => {
 app.use(express.static('./public'))
 
 io.on('connection', (socket) => {
-  socket.on('sendMessage', (data) => {  
+  socket.on('sendMessage', (data) => {
+		console.log('链接成功!!!')
     data.id = socket.id;  
     io.emit('receiveMessage', data);  
   })  

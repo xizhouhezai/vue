@@ -10,23 +10,30 @@
 </template>
 
 <script>
+import * as io from 'socket.io-client'
+const socket = io.connect('http://localhost:3003')
+
 export default {
   name: 'HelloWorld',
-  mounted() {
-    let socket = io.connect('http://localhost:3003')
-    let btn = document.getElementById('msgbtn')
+  data () {
+    return {
+      id: ''
+    }
+  },
+  mounted () {
     let msginput = document.getElementById('msginput')
+    let btn = document.getElementById('msgbtn')
     let showbox = document.getElementById('showbox')
     btn.addEventListener('click', (event) => {
-        let msg = msginput.value
-        let data = {msg: msg}
-        socket.emit('sendMessage', data)
+      let msg = msginput.value
+      let data = {msg: msg}
+      socket.emit('sendMessage', data)
     })
     socket.on('receiveMessage', (data) => {
-        console.log('收到')
-        let message = document.createElement('div')
-        message.innerHTML = `${data.id}: ${data.msg}`
-        showbox.appendChild(message)
+      console.log('收到')
+      let message = document.createElement('div')
+      message.innerHTML = `${data.id}: ${data.msg}`
+      showbox.appendChild(message)
     })
   }
 }

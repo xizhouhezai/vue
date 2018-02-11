@@ -32,6 +32,7 @@ module.exports = {
       'api': resolve('src/api')
     }
   },
+  // plugins: ['vux-ui'],
   module: {
     rules: [
       ...(config.dev.useEslint? [{

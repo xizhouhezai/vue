@@ -51,7 +51,7 @@
         discList: []
       }
     },
-    created() {
+    mounted() {
       this._getRecommend()
       this._getDiscList()
     },
@@ -69,7 +69,9 @@
       },
       _getRecommend() {
         getRecommend().then((res) => {
+          console.log(res.data.slider)
           if (res.code === ERR_OK) {
+            console.log(res.data.slider)
             this.recommends = res.data.slider
           }
         })
