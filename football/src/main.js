@@ -3,11 +3,12 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import '@/common/stylus/index.styl'
-import 'common/css/iconfont.css'
-import 'common/icon/iconfont.css'
+import fastclick from 'fastclick'
+import '@/common/css/iconfont.css'
 
 Vue.config.productionTip = false
+
+fastclick.attach(document.body)
 
 /* eslint-disable no-new */
 new Vue({

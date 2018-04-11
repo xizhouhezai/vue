@@ -15,6 +15,7 @@
 import { Toast, Button, Field, IndexList } from 'mint-ui'
 import WingSpace from 'base/wing-space/wing-space'
 import { mapMutations } from 'vuex'
+import axios from 'axios'
 
 const MtButton = Button
 const MtField = Field
@@ -30,6 +31,11 @@ export default {
     },
     ...mapMutations({
       setIsAuth: 'SET_IS_AUTH'
+    })
+  },
+  mounted() {
+    axios.get('http://localhost:3000/data/read?type=it').then(res => {
+      console.log(res)
     })
   },
   components: {
