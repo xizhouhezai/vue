@@ -1,6 +1,6 @@
 var http = require('http')
 
-exports.Json = function(url, options) {
+exports.Json = function (url, options) {
   url += (url.indexOf('?') < 0 ? '?' : '&') + params(options)
   return new Promise((resolve, reject) => {
     http.get(url, (res) => {
@@ -35,7 +35,7 @@ exports.Json = function(url, options) {
   })
 }
 
-function params(data) {
+function params (data) {
   let url = ''
   for (var k in data) {
     let value = data[k] !== undefined ? data[k] : ''
