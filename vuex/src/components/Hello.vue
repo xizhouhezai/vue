@@ -3,7 +3,15 @@
     <h1 ref="nums">{{getCount}}</h1>
     <div @click="add">add</div>
     <div class="video">
-      <video :src="videoSrc" ref="v" @play="ready" @timeupdate="updateTime" autoplay></video>
+      <video
+        poster="static/logo.png"
+        controls controlslist="nodownload" 
+        :src="videoSrc" ref="v" 
+        @play="ready" 
+        @timeupdate="updateTime" 
+        autoplay
+        muted
+      ></video>
     </div>
     <div class="progress-wrapper">
       <span class="time time-l">0</span>
@@ -61,6 +69,7 @@ export default {
     ready (e) {
       if (this.isplay) {
         this.duration = this.$refs.v.duration
+        this.pause()
         this.isplay = false
       }
     },
