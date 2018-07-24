@@ -33,11 +33,7 @@ export default {
       setIsAuth: 'SET_IS_AUTH'
     })
   },
-  mounted() {
-    axios.get('http://localhost:3000/data/read?type=it').then(res => {
-      console.log(res)
-    })
-  },
+  mounted() {},
   components: {
     MtButton,
     MtField,
