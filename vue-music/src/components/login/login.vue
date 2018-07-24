@@ -15,7 +15,6 @@
 import { Toast, Button, Field, IndexList } from 'mint-ui'
 import WingSpace from 'base/wing-space/wing-space'
 import { mapMutations } from 'vuex'
-import axios from 'axios'
 
 const MtButton = Button
 const MtField = Field
