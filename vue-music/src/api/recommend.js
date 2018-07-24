@@ -14,7 +14,14 @@ export function getRecommend() {
 }
 
 export function getDiscList() {
-  const url = 'http://localhost:3003/api/getDiscList'
+  let hostname = window.location.hostname
+  let uri = ''
+  if (hostname === 'www.xizhouhezai.com') {
+    uri = `${hostname}:9000`
+  } else {
+    uri = 'localhost:3003'
+  }
+  const url = uri + '/api/getDiscList'
 
   return axios.get(url).then((res) => {
     return Promise.resolve(res.data)
